@@ -2,7 +2,7 @@
 
 A refined, **100% offline-first** desktop app for keeping track of what's inside
 your fridge and what to cook next. No account, no network calls, no telemetry —
-everything runs locally and works on a plane. Designed with an Apple-inspired
+everything runs locally and works on a plane. Designed with a
 philosophy: system greys, generous whitespace, hairline dividers, pill controls,
 soft layered depth and subtle spring motion. The interface is strictly black and
 white, with a matching arch logo on Linux and Windows. A short, quiet entrance
