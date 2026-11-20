@@ -167,3 +167,7 @@ cd /home/sandhyaps/vibe/projects/leftovr/arch
 ./rebuild.sh
 sudo pacman -U ./leftovr-1.0.0-1-x86_64.pkg.tar.zst
 ```
+
+
+<img width="1920" height="1080" alt="Screenshot_20261120_145134" src="https://github.com/user-attachments/assets/75b1a537-495a-4c0c-bbe3-32e6c7a710e2" />
+
