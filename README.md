@@ -236,6 +236,8 @@ sudo pacman -U ./leftovr-1.0.0-1-x86_64.pkg.tar.zst
 ```
 
 <img width="1920" height="1080" alt="Screenshot_20261120_145134" src="https://github.com/user-attachments/assets/75b1a537-495a-4c0c-bbe3-32e6c7a710e2" />
+<img width="1920" height="1080" alt="Screenshot_20261121_014312" src="https://github.com/user-attachments/assets/76b05e18-24cc-440a-ba3d-3ee93a8f9a53" />
+
 
 ## License
 
