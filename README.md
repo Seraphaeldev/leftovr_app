@@ -118,6 +118,70 @@ The source artwork is `artwork/icon.svg`. Derived assets:
 - Local persistence via `shared_preferences`, seeded with sample items
 - Responsive layout for wide and narrow windows
 
+## Project architecture
+
+leftovr is one Flutter desktop app with a deliberately small dependency surface:
+no HTTP client, no database engine and no sync service. The Dart application is
+shared by both platforms; `linux/` and `windows/` are thin native runner shells
+that only host the Flutter engine, provide the window, and embed the icon.
+
+### Layout
+
+```
+lib/
+├── main.dart                 app entry; injects SharedPreferences, theme, screens
+├── theme.dart                strict monochrome light/dark palettes and text styles
+├── cubit/
+│   └── fridge_cubit.dart     single source of truth: state, actions, persistence
+├── models/                   pure data classes (no Flutter dependency)
+│   ├── fridge_item.dart      inventory item, category, expiry status, JSON codec
+│   ├── meal_plan.dart        planned meal: recipe id, servings, slot
+│   └── recipe.dart           built-in catalog of ten recipes + ingredients
+├── services/                 pure-Dart business logic, all local
+│   ├── quick_entry.dart      natural-language quick-entry parser
+│   ├── recipe_matcher.dart   scores recipes against current stock
+│   ├── markdown_export.dart  aggregates demand, subtracts stock, renders Markdown
+│   ├── inventory_file.dart   JSON mirror at ~/.leftovr/inventory.json
+│   └── expiry.dart           expiry report shared by the app and the CLI
+├── screens/
+│   ├── splash_screen.dart    dot-matrix boot animation (tap to skip)
+│   └── home_screen.dart      three-pane workspace + global keyboard shortcuts
+└── widgets/
+    ├── navigation_pane.dart  search, filters and category rail
+    ├── quick_entry.dart      quick-entry bar with live preview
+    ├── add_item_sheet.dart   full add/edit item dialog
+    ├── planning_pane.dart    Recipes / Plan / List tabs
+    └── decorations.dart      monochrome cards, badges, TrayMark artwork
+
+bin/expiry.dart               standalone CLI entry point (dart compile exe)
+scripts/leftovr-expiry.*      systemd service and daily timer units
+arch/PKGBUILD, rebuild.sh     Arch package, wrapper launcher, compiled CLI
+linux/, windows/              native runners, desktop entry, embedded icons
+artwork/ → assets/            SVG sources → derived PNG/ICO assets
+test/widget_test.dart         widget and logic regression tests
+```
+
+### Data flow
+
+Widgets read from one `FridgeCubit` and call its methods; the cubit updates an
+`Equatable` `FridgeState` and persists it. `BlocBuilder.buildWhen` keeps rebuilds
+scoped to the slice of state each pane actually uses.
+
+```
+quick entry / add dialog ──► FridgeCubit ──► FridgeState ──► three panes
+                                  │
+                                  ├─► SharedPreferences   (canonical store)
+                                  └─► ~/.leftovr/inventory.json  (mirror)
+                                              │
+                                              ▼
+                                     bin/expiry.dart ──► CLI / systemd timer
+```
+
+Recipe matching and the shopping list are computed on demand from in-memory
+state plus the built-in catalog; they are never cached to disk or fetched. The
+offline boundary is visible in `pubspec.yaml`: the only runtime dependencies are
+`shared_preferences`, `flutter_bloc`, `equatable` and `cupertino_icons`.
+
 ## Keyboard shortcuts
 
 | Shortcut | Action |
