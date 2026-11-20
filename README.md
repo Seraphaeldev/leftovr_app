@@ -13,7 +13,7 @@ opens the app, and Bloc/Cubit state management keeps rebuilds fast and scoped.
 The release build is already in the repo:
 
 ```bash
-cd /home/sandhyaps/vibe/projects/leftovr
+cd /path/to/leftovr
 ./run_linux.sh
 ```
 
@@ -142,7 +142,7 @@ The app mirrors the inventory to `~/.leftovr/inventory.json` (override with
 `LEFTOVR_DATA_DIR`). A dependency-free CLI reads it:
 
 ```bash
-cd /home/sandhyaps/vibe/projects/leftovr
+cd /path/to/leftovr
 dart run bin/expiry.dart          # plain-text report
 dart run bin/expiry.dart --json   # machine-readable
 ```
@@ -166,7 +166,7 @@ computer.
 A prebuilt package is produced by `arch/rebuild.sh`:
 
 ```bash
-cd /home/sandhyaps/vibe/projects/leftovr/arch
+cd /path/to/leftovr/arch
 ./rebuild.sh
 sudo pacman -U ./leftovr-1.0.0-1-x86_64.pkg.tar.zst
 ```
