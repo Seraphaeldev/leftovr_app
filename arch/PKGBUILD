@@ -2,7 +2,7 @@
 pkgname=leftovr
 pkgver=1.0.0
 pkgrel=1
-pkgdesc="Light retro-terminal desktop app for tracking what is inside your fridge"
+pkgdesc="Offline-first fridge inventory and meal planner for Linux"
 arch=('x86_64')
 url="https://github.com/local/leftovr"
 license=('custom')

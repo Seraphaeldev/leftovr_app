@@ -1,5 +1,5 @@
 name: leftovr
-description: "A clean, minimal inventory for everything in your fridge."
+description: "Offline-first fridge inventory & meal planner."
 publish_to: 'none'
 version: 1.0.0+1
 

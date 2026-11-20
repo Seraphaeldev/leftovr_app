@@ -5,7 +5,7 @@ your fridge and what to cook next. No account, no network calls, no telemetry â€
 everything runs locally and works on a plane. Designed with a
 philosophy: system greys, generous whitespace, hairline dividers, pill controls,
 soft layered depth and subtle spring motion. The interface is strictly black and
-white, with a matching arch logo on Linux and Windows. A short, quiet entrance
+white, with a matching monochrome tray logo on Linux and Windows. A short, quiet entrance
 opens the app, and Bloc/Cubit state management keeps rebuilds fast and scoped.
 
 ## Run on Linux
@@ -168,6 +168,8 @@ cd /home/sandhyaps/vibe/projects/leftovr/arch
 sudo pacman -U ./leftovr-1.0.0-1-x86_64.pkg.tar.zst
 ```
 
-
 <img width="1920" height="1080" alt="Screenshot_20261120_145134" src="https://github.com/user-attachments/assets/75b1a537-495a-4c0c-bbe3-32e6c7a710e2" />
 
+## License
+
+Apache License 2.0 â€” Copyright 2026 Seraphael. See `LICENSE`.
