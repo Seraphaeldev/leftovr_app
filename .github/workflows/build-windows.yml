@@ -1,0 +1,61 @@
+name: Build Windows
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Windows release
+        run: flutter build windows --release
+
+      - name: Package portable zip
+        shell: pwsh
+        run: |
+          $src = 'build\windows\x64\runner\Release'
+          $stage = 'build\leftovr-windows'
+          if (-not (Test-Path "$src\leftovr.exe")) {
+            throw "Build output not found at $src"
+          }
+          if (Test-Path $stage) {
+            Remove-Item $stage -Recurse -Force
+          }
+          New-Item -ItemType Directory -Path $stage -Force | Out-Null
+          Copy-Item -Path "$src\*" -Destination $stage -Recurse -Force
+          Copy-Item -Path 'windows\portable\Run leftovr.bat' -Destination $stage -Force
+          Copy-Item -Path 'windows\portable\README.txt' -Destination $stage -Force
+          Compress-Archive -Path $stage -DestinationPath 'build\leftovr-windows.zip' -Force
+
+      - name: Upload downloadable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: leftovr-windows
+          path: build\leftovr-windows.zip
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build\leftovr-windows.zip
+          generate_release_notes: true

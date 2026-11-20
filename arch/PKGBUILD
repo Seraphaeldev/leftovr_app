@@ -1,0 +1,51 @@
+# Maintainer: local
+pkgname=leftovr
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Light retro-terminal desktop app for tracking what is inside your fridge"
+arch=('x86_64')
+url="https://github.com/local/leftovr"
+license=('custom')
+depends=(
+  'gtk3'
+  'at-spi2-core'
+  'libx11'
+  'libxrandr'
+  'libxinerama'
+  'libxcursor'
+  'libxi'
+  'libxcomposite'
+  'libxdamage'
+  'libxfixes'
+  'libxrender'
+  'libxkbcommon'
+  'wayland'
+  'libglvnd'
+  'mesa'
+  'libdrm'
+  'libseccomp'
+  'sqlite'
+  'libpng'
+)
+source=("leftovr-bundle-${pkgver}.tar.gz")
+sha256sums=('SKIP')
+options=('!strip')
+
+package() {
+  # Flutter bundle (binary, data, lib) lives in /opt
+  install -d "${pkgdir}/opt/${pkgname}"
+  cp -a "${srcdir}/bundle/." "${pkgdir}/opt/${pkgname}/"
+
+  # Launcher on PATH. A symlink would make the dynamic loader look for
+  # $ORIGIN/lib under /usr/bin, so exec the bundle binary directly.
+  install -d "${pkgdir}/usr/bin"
+  printf '#!/bin/sh\nexec /opt/%s/%s "$@"\n' "${pkgname}" "${pkgname}" \
+    > "${pkgdir}/usr/bin/${pkgname}"
+  chmod 755 "${pkgdir}/usr/bin/${pkgname}"
+
+  # Desktop menu entry and icon
+  install -Dm644 "${srcdir}/leftovr.desktop" \
+    "${pkgdir}/usr/share/applications/${pkgname}.desktop"
+  install -Dm644 "${srcdir}/leftovr.png" \
+    "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${pkgname}.png"
+}

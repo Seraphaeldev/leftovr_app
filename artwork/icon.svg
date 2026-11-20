@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>leftovr</title>
+
+  <!-- white tile with the faintest hairline edge -->
+  <rect width="512" height="512" rx="112" fill="#FFFFFF"/>
+  <rect x="0.5" y="0.5" width="511" height="511" rx="111.5"
+        fill="none" stroke="#000000" stroke-opacity="0.10"/>
+
+  <!-- monochrome tray mark: black body, white details -->
+  <g transform="translate(89.6 89.6) scale(2.6)">
+    <rect x="28" y="6" width="72" height="116" rx="18" fill="#000000"/>
+    <path d="M28 42H100" fill="none" stroke="#FFFFFF" stroke-width="5"/>
+    <circle cx="48" cy="24" r="5.5" fill="#FFFFFF"/>
+    <circle cx="68" cy="24" r="5.5" fill="#FFFFFF"/>
+    <rect x="84" y="18" width="6" height="12" rx="3" fill="#FFFFFF"/>
+    <rect x="84" y="52" width="6" height="14" rx="3" fill="#FFFFFF"/>
+    <path d="M46 84Q64 104 82 84" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round"/>
+  </g>
+</svg>

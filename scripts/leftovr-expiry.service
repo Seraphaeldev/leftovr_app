@@ -1,0 +1,8 @@
+[Unit]
+Description=leftovr expiry check (local, offline)
+Documentation=file:///usr/share/doc/leftovr/README.md
+
+[Service]
+Type=oneshot
+Environment=LEFTOVR_DATA_DIR=%h/.leftovr
+ExecStart=/usr/bin/dart run /opt/leftovr/bin/expiry.dart

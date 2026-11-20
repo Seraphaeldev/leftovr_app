@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=leftovr
+GenericName=Fridge Inventory
+Comment=Know what is left. Waste nothing.
+Exec=leftovr
+Icon=leftovr
+Categories=Utility;
+Terminal=false
+StartupNotify=true
