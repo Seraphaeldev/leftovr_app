@@ -38,7 +38,7 @@ class _PlanningPaneState extends State<PlanningPane> {
         final shopping = const MarkdownExporter().shoppingList(
           state.plannedMeals,
           state.items
-              .map((i) => FridgeItemLite(i.name, i.quantity))
+              .map((i) => FridgeItemLite(i.name, i.quantity, i.unit))
               .toList(),
         );
 
@@ -82,31 +82,49 @@ class _PlanningPaneState extends State<PlanningPane> {
           for (var i = 0; i < labels.length; i++) ...[
             if (i > 0) const SizedBox(width: 2),
             Expanded(
-              child: GestureDetector(
-                onTap: () => setState(() => _tab = i),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    color: _tab == i ? AppPalette.surface : Colors.transparent,
-                    borderRadius: BorderRadius.circular(11),
-                    boxShadow: _tab == i
-                        ? [
-                            BoxShadow(
-                              color: AppPalette.shadow,
-                              blurRadius: 5,
-                              offset: const Offset(0, 1),
-                            ),
-                          ]
-                        : null,
+              child: FocusableActionDetector(
+                actions: {
+                  ActivateIntent: CallbackAction<ActivateIntent>(
+                    onInvoke: (_) => setState(() => _tab = i),
                   ),
-                  child: Center(
-                    child: Text(
-                      labels[i],
-                      style: AppText.chip.copyWith(
-                        color: _tab == i ? AppPalette.ink : AppPalette.muted,
-                        fontWeight:
-                            _tab == i ? FontWeight.w600 : FontWeight.w500,
+                },
+                shortcuts: const {
+                  SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+                  SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+                },
+                child: GestureDetector(
+                  onTap: () => setState(() => _tab = i),
+                  child: Semantics(
+                    button: true,
+                    selected: _tab == i,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color:
+                            _tab == i ? AppPalette.surface : Colors.transparent,
+                        borderRadius: BorderRadius.circular(11),
+                        boxShadow: _tab == i
+                            ? [
+                                BoxShadow(
+                                  color: AppPalette.shadow,
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ]
+                            : null,
+                      ),
+                      child: Center(
+                        child: Text(
+                          labels[i],
+                          style: AppText.chip.copyWith(
+                            color:
+                                _tab == i ? AppPalette.ink : AppPalette.muted,
+                            fontWeight: _tab == i
+                                ? FontWeight.w600
+                                : FontWeight.w500,
+                          ),
+                        ),
                       ),
                     ),
                   ),

@@ -131,7 +131,7 @@ class FridgeCubit extends Cubit<FridgeState> {
   Future<void> load() async {
     final raw = _prefs.getString(_storageKey);
     final loaded = raw == null ? null : FridgeItem.decodeList(raw);
-    final items = (loaded == null || loaded.isEmpty) ? FridgeItem.seed() : loaded;
+    final items = loaded ?? FridgeItem.seed();
     final planRaw = _prefs.getString(_planKey);
     emit(state.copyWith(
       items: items,

@@ -156,7 +156,10 @@ systemctl --user daemon-reload
 systemctl --user enable --now leftovr-expiry.timer
 ```
 
-The timer only runs the local Dart script — nothing leaves your computer.
+The Arch package installs a standalone `leftovr-expiry` CLI at `/opt/leftovr`;
+the timer runs that local binary. From a source checkout without the package,
+change `ExecStart` to `dart run <repo>/bin/expiry.dart`. Nothing leaves your
+computer.
 
 ## Install on Arch / EndeavourOS
 

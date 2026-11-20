@@ -7,6 +7,7 @@
 AppName=leftovr
 AppVersion=1.0.0
 AppPublisher=leftovr
+SourceDir=..
 DefaultDirName={autopf}\leftovr
 DefaultGroupName=leftovr
 OutputDir=build\installer

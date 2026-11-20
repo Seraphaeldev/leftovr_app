@@ -32,9 +32,10 @@ sha256sums=('SKIP')
 options=('!strip')
 
 package() {
-  # Flutter bundle (binary, data, lib) lives in /opt
+  # Flutter bundle (binary, data, lib) and the standalone expiry CLI live in /opt
   install -d "${pkgdir}/opt/${pkgname}"
   cp -a "${srcdir}/bundle/." "${pkgdir}/opt/${pkgname}/"
+  install -Dm644 "${srcdir}/README.md" "${pkgdir}/opt/${pkgname}/README.md"
 
   # Launcher on PATH. A symlink would make the dynamic loader look for
   # $ORIGIN/lib under /usr/bin, so exec the bundle binary directly.

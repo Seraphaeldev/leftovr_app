@@ -4,7 +4,7 @@ import '../models/recipe.dart';
 /// One aggregated line in the shopping list.
 class ShoppingItem {
   ShoppingItem(this.name, this.quantity, this.unit)
-      : key = name.trim().toLowerCase();
+      : key = '${name.trim().toLowerCase()}|${unit.trim().toLowerCase()}';
 
   final String name;
   final int quantity;
@@ -20,37 +20,56 @@ class MarkdownExporter {
     List<PlannedMeal> plan,
     List<FridgeItemLite> stock,
   ) {
-    final totals = <String, ShoppingItem>{};
-
+    // Aggregate the whole plan first, so several meals drawing on the same
+    // ingredient share one stock balance instead of each seeing it in full.
+    final needs = <String, _Need>{};
     for (final meal in plan) {
       final recipe = Recipe.byId(meal.recipeId);
       if (recipe == null) continue;
       for (final ingredient in recipe.ingredients) {
-        final needed = (ingredient.quantity * meal.servings / recipe.servings)
-            .ceil();
-        final available = stock
-            .where((s) => _matches(s.name, ingredient.name))
-            .fold<int>(0, (sum, s) => sum + s.quantity);
-        final short = needed - available;
-        if (short <= 0) continue;
-
-        final key = ingredient.name.trim().toLowerCase();
-        final existing = totals[key];
-        if (existing == null) {
-          totals[key] = ShoppingItem(ingredient.name, short, ingredient.unit);
-        } else {
-          totals[key] = ShoppingItem(
-            existing.name,
-            existing.quantity + short,
-            existing.unit,
-          );
-        }
+        final key =
+            '${ingredient.name.trim().toLowerCase()}|${_normalizeUnit(ingredient.unit)}';
+        final need = needs.putIfAbsent(
+          key,
+          () => _Need(ingredient.name, ingredient.unit),
+        );
+        need.quantity +=
+            (ingredient.quantity * meal.servings / recipe.servings).ceil();
       }
+    }
+
+    final totals = <String, ShoppingItem>{};
+    for (final need in needs.values) {
+      final available = stock.fold<int>(
+        0,
+        (sum, s) =>
+            sum + (_matches(s.name, need.name) ? _availableInUnit(s, need.unit) : 0),
+      );
+      final short = need.quantity - available;
+      if (short <= 0) continue;
+
+      final key =
+          '${need.name.trim().toLowerCase()}|${_normalizeUnit(need.unit)}';
+      totals[key] = ShoppingItem(need.name, short, need.unit);
     }
 
     final items = totals.values.toList()
       ..sort((a, b) => a.name.compareTo(b.name));
     return items;
+  }
+
+  /// Stock only counts towards a need written in a compatible unit.
+  int _availableInUnit(FridgeItemLite item, String unit) {
+    return _normalizeUnit(item.unit) == _normalizeUnit(unit) ? item.quantity : 0;
+  }
+
+  /// Lowercase and fold singular/plural spellings such as `cup`/`cups`.
+  static String _normalizeUnit(String unit) {
+    final value = unit.trim().toLowerCase();
+    if (value.length > 1 && value.endsWith('s')) {
+      return value.substring(0, value.length - 1);
+    }
+    return value;
   }
 
   String render({
@@ -117,11 +136,21 @@ class MarkdownExporter {
   }
 }
 
+/// One ingredient's total demand across the whole meal plan.
+class _Need {
+  _Need(this.name, this.unit);
+
+  final String name;
+  final String unit;
+  int quantity = 0;
+}
+
 /// The tiny slice of an inventory item the exporter needs. Kept separate so
 /// pure-Dart tooling can supply it without depending on Flutter.
 class FridgeItemLite {
-  const FridgeItemLite(this.name, this.quantity);
+  const FridgeItemLite(this.name, this.quantity, [this.unit = 'pcs']);
 
   final String name;
   final int quantity;
+  final String unit;
 }

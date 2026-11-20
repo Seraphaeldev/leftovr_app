@@ -4,9 +4,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:leftovr/main.dart';
 import 'package:leftovr/models/fridge_item.dart';
+import 'package:leftovr/models/meal_plan.dart';
 import 'package:leftovr/screens/home_screen.dart';
 import 'package:leftovr/screens/splash_screen.dart';
 import 'package:leftovr/services/expiry.dart';
+import 'package:leftovr/services/markdown_export.dart';
 import 'package:leftovr/services/quick_entry.dart';
 import 'package:leftovr/widgets/decorations.dart';
 
@@ -244,6 +246,39 @@ void main() {
       findsNWidgets(2), // preview + export dialog
     );
     expect(find.textContaining('rice'), findsWidgets);
+  });
+
+  test('shopping list shares one stock balance across planned meals', () {
+    final shopping = const MarkdownExporter().shoppingList(
+      [
+        PlannedMeal(recipeId: 'tomato_omelette', servings: 1),
+        PlannedMeal(recipeId: 'tomato_omelette', servings: 1),
+      ],
+      const [FridgeItemLite('eggs', 3)],
+    );
+
+    final eggs = shopping.singleWhere((i) => i.name.toLowerCase() == 'eggs');
+    expect(eggs.quantity, 3); // 6 needed across two meals, 3 in stock
+  });
+
+  test('shopping list ignores stock in an incompatible unit', () {
+    final shopping = const MarkdownExporter().shoppingList(
+      [PlannedMeal(recipeId: 'spinach_pasta', servings: 2)],
+      const [FridgeItemLite('milk', 1, 'L')],
+    );
+
+    final milk = shopping.singleWhere((i) => i.name.toLowerCase() == 'milk');
+    expect(milk.unit, 'cup');
+    expect(milk.quantity, 1); // 1 L cannot cover 1 cup
+  });
+
+  test('shopping list accepts matching plural units', () {
+    final shopping = const MarkdownExporter().shoppingList(
+      [PlannedMeal(recipeId: 'chicken_rice', servings: 2)],
+      const [FridgeItemLite('rice', 1, 'cups')],
+    );
+
+    expect(shopping.where((i) => i.name.toLowerCase() == 'rice'), isEmpty);
   });
 
   test('quick entry parser understands quantity, expiry and category', () {
