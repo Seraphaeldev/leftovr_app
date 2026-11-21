@@ -43,25 +43,8 @@ cmake --install build/linux/x64/release --prefix ~/.local
 
 ## Run on Windows
 
-Flutter cannot cross-compile a Windows binary from Linux, so the `.exe` has to
-be built on Windows. There are two ways to get it.
-
-### Option A — build in the cloud (no Windows PC needed)
-
-`.github/workflows/build-windows.yml` builds and packages the app on a Windows
-GitHub Actions runner:
-
-1. Push this project to a GitHub repository.
-2. Open the **Actions** tab → **Build Windows** → **Run workflow**.
-3. When it finishes, download the `leftovr-windows` artifact and unzip it.
-
-For a permanent download link instead of an expiring artifact, push a version
-tag (e.g. `git tag v1.0.0 && git push origin v1.0.0`); the workflow also creates
-a GitHub Release with the zip attached.
-
-### Option B — build on a Windows PC
-
-On a Windows machine with Flutter installed, double-click `build_windows.bat`.
+Flutter cannot cross-compile a Windows binary from Linux, so build the `.exe`
+on a Windows machine with Flutter installed. Double-click `build_windows.bat`.
 It builds the release and produces:
 
 - `build\leftovr-windows\` — portable folder
