@@ -69,37 +69,18 @@ The source artwork is `artwork/icon.svg`. Derived assets:
 
 ## Features
 
-- **100% offline-first native desktop app** — no network code, no account, no
-  cloud sync; all data lives on your machine
-- **Keyboard-driven smart quick-entry** — type `2 milk 3d`, `eggs x6 tomorrow`
-  or `spinach exp 2026-12-01` and press Enter. Quantity, unit, use-by date and
-  category are parsed locally, with a live preview before you commit.
-- **Three-pane workspace** — navigation & filters on the left, inventory in the
-  middle, recipe matching / meal planning / shopping list on the right
-- **Offline recipe matcher** — a built-in catalog of ten recipes scored against
-  what you actually have; see coverage and missing ingredients instantly
-- **Markdown shopping list exports** — planned meals become a checked-off
-  Markdown list of only the things you are missing, previewed in-app and copied
-  to the clipboard
-- **Zero-bloat expiry notifications** — a lightweight in-app timer plus a tiny
-  CLI/systemd-timer report; no notification daemon or heavy dependencies
-- Apple-inspired black-and-white interface: system greys, hairline dividers,
-  pill controls, soft shadows and subtle spring motion
-- Light and dark backgrounds: a toolbar toggle repaints the **entire** app
-  between two strict monochrome palettes; the choice is saved between runs
-- Dot-matrix boot animation: "leftovr" lights up one LED at a time in a rhythmic
-  scan — tap to skip
-- Add items with name, category, quantity, unit, use-by date and notes via the
-  full dialog, or use quick entry for speed
-- Search, freshness and category filters, plus sorting by expiry / name /
-  quantity / category
-- Changed items get a brief highlight in place — updates are easy to spot
-  without rows reordering or flickering
-- Expiry badges (Fresh / Soon / Outdated) and quantity steppers
-- State managed with `flutter_bloc` / `equatable` via a single `FridgeCubit`;
-  widgets rebuild only for the state slice they use (`BlocBuilder.buildWhen`)
-- Local persistence via `shared_preferences`, seeded with sample items
-- Responsive layout for wide and narrow windows
+- **100% offline-first** — no network, account, cloud sync or telemetry; all
+  data stays on your machine.
+- **Quick entry** — type `2 milk 3d` and press Enter; quantity, unit, expiry and
+  category are parsed locally with a live preview.
+- **Three-pane workspace** — filters, inventory, and recipe planning on one screen.
+- **Offline recipes** — ten built-in recipes scored against your stock; planned
+  meals become a Markdown shopping list of only what's missing.
+- **Expiry alerts** — a lightweight in-app timer plus a small CLI/systemd report.
+- **Strict monochrome UI** — light/dark toggle saved between runs, keyboard
+  shortcuts, and a responsive layout.
+- **Local persistence** — `shared_preferences` with a JSON mirror for the CLI;
+  `flutter_bloc`/`equatable` keep rebuilds scoped.
 
 ## Project architecture
 
