@@ -189,7 +189,7 @@ the timer runs that local binary. From a source checkout without the package,
 change `ExecStart` to `dart run <repo>/bin/expiry.dart`. Nothing leaves your
 computer.
 
-## Install on Arch / EndeavourOS
+## Install on Arch 
 
 A prebuilt package is produced by `arch/rebuild.sh`:
 
