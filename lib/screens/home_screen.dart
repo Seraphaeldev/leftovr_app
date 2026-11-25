@@ -328,26 +328,55 @@ class _AlertBadge extends StatelessWidget {
     return BlocBuilder<FridgeCubit, FridgeState>(
       buildWhen: (a, b) => a.items != b.items,
       builder: (context, state) {
-        final count =
-            state.count(ExpiryStatus.soon) + state.count(ExpiryStatus.expired);
-        return Tooltip(
-          message: count == 0
-              ? 'Nothing expiring soon'
-              : '$count item(s) need attention',
+        final count = state.count(ExpiryStatus.soon) +
+            state.count(ExpiryStatus.expired);
+
+        return PopupMenuButton<void>(
+          tooltip: 'Notifications',
+          padding: EdgeInsets.zero,
+          color: AppPalette.surface,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+            side: BorderSide(color: AppPalette.line),
+          ),
+          offset: const Offset(0, 44),
+          constraints: const BoxConstraints(minWidth: 320, maxWidth: 380),
+          itemBuilder: (context) {
+            // Recompute on open: an item can cross into "soon" or "expired"
+            // purely from the passing date, with no inventory change to
+            // rebuild this widget.
+            final current = context.read<FridgeCubit>().state;
+            final alerts = current.items
+                .where((item) =>
+                    item.status == ExpiryStatus.soon ||
+                    item.status == ExpiryStatus.expired)
+                .toList()
+              ..sort((a, b) => a.expiry.compareTo(b.expiry));
+            return [
+              PopupMenuItem<void>(
+                value: null,
+                enabled: false,
+                padding: EdgeInsets.zero,
+                child: _NotificationPanel(alerts: alerts),
+              ),
+            ];
+          },
           child: Container(
             height: 36,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: count == 0
-                  ? AppPalette.surfaceSunken
-                  : AppPalette.ink,
+              color: count == 0 ? AppPalette.surfaceSunken : AppPalette.ink,
               borderRadius: BorderRadius.circular(18),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  Icons.notifications_none_outlined,
+                  count == 0
+                      ? Icons.notifications_none_outlined
+                      : Icons.notifications_active_outlined,
                   size: 16,
                   color: count == 0 ? AppPalette.ink : AppPalette.onInk,
                 ),
@@ -364,6 +393,115 @@ class _AlertBadge extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// The dropdown shown by the notification badge. Lists everything that is
+/// past its date or close to it, newest expiry first, with a quiet empty state.
+class _NotificationPanel extends StatelessWidget {
+  const _NotificationPanel({required this.alerts});
+
+  final List<FridgeItem> alerts;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 340,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 12),
+            child: Row(
+              children: [
+                Text('Expiry alerts', style: AppText.title),
+                const Spacer(),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: AppPalette.surfaceSunken,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    '${alerts.length}',
+                    style: AppText.badge.copyWith(color: AppPalette.muted),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          if (alerts.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 30),
+              child: Column(
+                children: [
+                  Icon(Icons.check_circle_outline,
+                      size: 28, color: AppPalette.muted),
+                  const SizedBox(height: 10),
+                  Text('All good — nothing is expiring soon.',
+                      style: AppText.bodyMuted),
+                ],
+              ),
+            )
+          else
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 320),
+              child: ListView.separated(
+                shrinkWrap: true,
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                itemCount: alerts.length,
+                separatorBuilder: (_, _) => const Divider(
+                  height: 1,
+                  indent: 18,
+                  endIndent: 18,
+                ),
+                itemBuilder: (context, index) {
+                  final item = alerts[index];
+                  final statusColor = switch (item.status) {
+                    ExpiryStatus.fresh => AppPalette.fresh,
+                    ExpiryStatus.soon => AppPalette.soon,
+                    ExpiryStatus.expired => AppPalette.expired,
+                  };
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 18, vertical: 10),
+                    child: Row(
+                      children: [
+                        Icon(item.category.icon,
+                            size: 18, color: AppPalette.muted),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item.name,
+                                style: AppText.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 3),
+                              Text(_ItemRow._daysLabel(item),
+                                  style: AppText.bodyMuted),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          item.status.label,
+                          style: AppText.badge.copyWith(color: statusColor),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
