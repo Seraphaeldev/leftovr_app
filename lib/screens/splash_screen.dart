@@ -69,45 +69,53 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    final t = _controller.value;
+    // The controller drives every visual value below, so the subtree must
+    // rebuild on each tick. Without this listener the splash sits at t = 0
+    // (fully transparent) until the status listener navigates away.
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        final t = _controller.value;
 
-    // The whole matrix eases in, holds, then gives way to the app.
-    final appear = _smoothstep(0, 0.12, t);
-    final exit = 1 - _smoothstep(0.90, 1.0, t);
-    final opacity = (appear * exit).clamp(0.0, 1.0);
+        // The whole matrix eases in, holds, then gives way to the app.
+        final appear = _smoothstep(0, 0.12, t);
+        final exit = 1 - _smoothstep(0.90, 1.0, t);
+        final opacity = (appear * exit).clamp(0.0, 1.0);
 
-    // Once formed, the word shrinks a touch into its final resting place.
-    final settle = _smoothstep(0.70, 0.90, t);
-    final scale = 1.04 - 0.04 * settle;
+        // Once formed, the word shrinks a touch into its final resting place.
+        final settle = _smoothstep(0.70, 0.90, t);
+        final scale = 1.04 - 0.04 * settle;
 
-    return BlocBuilder<FridgeCubit, FridgeState>(
-      buildWhen: (a, b) => a.isDark != b.isDark,
-      builder: (context, state) {
-        AppPalette.brightness =
-            state.isDark ? Brightness.dark : Brightness.light;
-        return Scaffold(
-          key: ValueKey(state.isDark),
-          backgroundColor: AppPalette.background,
-          body: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: _finish,
-            child: Center(
-              child: Opacity(
-                opacity: opacity,
-                child: Transform.scale(
-                  scale: scale,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: SizedBox(
-                      width: 430,
-                      height: 110,
-                      child: DotMatrixText(text: _name, progress: t),
+        return BlocBuilder<FridgeCubit, FridgeState>(
+          buildWhen: (a, b) => a.isDark != b.isDark,
+          builder: (context, state) {
+            AppPalette.brightness =
+                state.isDark ? Brightness.dark : Brightness.light;
+            return Scaffold(
+              key: ValueKey(state.isDark),
+              backgroundColor: AppPalette.background,
+              body: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: _finish,
+                child: Center(
+                  child: Opacity(
+                    opacity: opacity,
+                    child: Transform.scale(
+                      scale: scale,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: SizedBox(
+                          width: 430,
+                          height: 110,
+                          child: DotMatrixText(text: _name, progress: t),
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );

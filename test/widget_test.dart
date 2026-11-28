@@ -65,6 +65,31 @@ void main() {
     expect(find.byType(HomeScreen), findsOneWidget);
   });
 
+  testWidgets('splash fades in as the animation advances', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    await tester.pumpWidget(LeftovrApp(prefs: prefs));
+
+    Opacity splashOpacity() => tester.widget<Opacity>(
+          find
+              .descendant(
+                of: find.byType(SplashScreen),
+                matching: find.byType(Opacity),
+              )
+              .first,
+        );
+
+    // At t = 0 the matrix is invisible; the controller's ticks must rebuild
+    // the splash or it stays a blank white screen for the whole 3.2 seconds.
+    expect(splashOpacity().opacity, lessThan(0.1));
+
+    await tester.pump(const Duration(milliseconds: 800)); // t = 0.25
+    expect(splashOpacity().opacity, greaterThan(0.9));
+
+    await tester.pump(const Duration(milliseconds: 2200)); // t = 0.9375
+    expect(splashOpacity().opacity, lessThan(1.0)); // easing out
+  });
+
   testWidgets('home shows the inventory with images and controls',
       (tester) async {
     await _openApp(tester);
